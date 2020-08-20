@@ -1,6 +1,3 @@
-NRIC: S9320265A
-Email: allenus1234@gmail.com
-
 # Introduction
 
 1. Appropriate use of algorithms/models

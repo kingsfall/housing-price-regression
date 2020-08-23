@@ -52,7 +52,7 @@ credit: [Link](http://www.statisticshowto.com)
 
 We will be using Root Mean Square Error (RMSE) as the evaluation metrics on the performance of our models. RMSE is the standard deviation of the residuals (prediction errors). Residuals are a measure of how far from the regression line data points are; RMSE measures of how spread out these residuals are. In other words, it tells you how concentrated the data is around the line of best fit.Because we are performing regression,  RMSE is a suitable evluation metrics.
 
-## Cross Validation
+# Cross Validation
 
 ![Image](https://miro.medium.com/max/601/1*PdwlCactbJf8F8C7sP-3gw.png)\
 credit:[Link](https://medium.com/the-owl/k-fold-cross-validation-in-keras-3ec4a3a00538)
@@ -61,12 +61,12 @@ As regression models might be prone to overfitting, we reduce this by performing
 
 Taking logs means that errors in predicting expensive houses and cheap houses will affect the result equally. We shall use the log price to train and fit to the regression models. Afterwhich, since the requirements ask that the evaluation metrics be compared with the true house price, we shall convert y_test back to original format before calculating the RSME. 
 
-## Linear Regression evaluation metrics:
+# Linear Regression evaluation metrics:
 
 rmse on train **0.2829659844570018** (based on log transformed price)
 rmse on test **236223.57554988982** (based on true price)
 
-## Classification evaluation metrics:
+# Classification evaluation metrics:
 
 For classification, firstly we have to decide how would we want to bin our house prices. By having fewer bins, we run the risk of can having a misleading histogram. I decided to use a variable bin size according to the 4 quantiles.
 
@@ -77,12 +77,15 @@ For classification, firstly we have to decide how would we want to bin our house
 
 ![Image](/src/Pictures/GNB-CM.png)\
 Normalized Confusion Matrix for GaussianNB\
-Number of mislabeled points out of a total 9844 points : 4593 accuracy of  **0.5334213734254368**
+Number of mislabeled points out of a total 9844 points : 4428 accuracy of  **0.5501828524989841**
 ![Image](/src/Pictures/MNB-CM.png)\
 Normalized Confusion Matrix for MultinomialNB\
-Number of mislabeled points out of a total 9844 points : 6597 accuracy of  **0.3298455912230801**
+Number of mislabeled points out of a total 9844 points : 5343 accuracy of  **0.4572328321820398**
 ![Image](/src/Pictures/SVC-CM.png)\
 Normalized Confusion Matrix for SVC\
-Number of mislabeled points out of a total 9844 points : 6748 accuracy of  **0.3145062982527428**
+Number of mislabeled points out of a total 9844 points : 4130 accuracy of  **0.5804550995530272**
 
+# Conclusions
 
+1. Standardisation does not have any effect on linear regression models. Standardisation in fact decreased the performance of all 3 classifier models.
+2. SVC has the better performance rating

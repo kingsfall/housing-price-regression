@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[57]:
+# In[101]:
 
 
 import sqlite3
@@ -11,28 +11,28 @@ from scipy.stats import skew
 import pgeocode
 
 
-# In[58]:
+# In[102]:
 
 
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-# In[59]:
+# In[103]:
 
 
 db = sqlite3.connect('home_sales.db')
 df = pd.read_sql_query('SELECT * FROM sales;',db)
 
 
-# In[60]:
+# In[104]:
 
 
 # dropping null values
 df = df.dropna()
 
 
-# In[61]:
+# In[105]:
 
 
 # feature engineering place_name from zipcode
@@ -44,7 +44,7 @@ df = df.replace({'place_name': {'Auburn':1,'Federal Way':2,'Kent':3,'Enumclaw':4
 })
 
 
-# In[62]:
+# In[106]:
 
 
 # relabel condition feature
@@ -60,31 +60,27 @@ df.loc[df.condition == 'EXCELLENT'] = df.loc[df.condition == 'EXCELLENT'].replac
 df.loc[df.condition == 'excellent'] = df.loc[df.condition == 'excellent'].replace("excellent","4")
 
 
-# In[63]:
+# In[107]:
 
 
 # convert object to int
 df['condition'] = df['condition'].astype(str).astype(int)
 
 
-# In[64]:
+# In[108]:
 
 
 # dropping unnecessary features
 df = df[['price', 'bedrooms', 'bathrooms', 'floors', 'waterfront', 'view', 'condition','review_score', 'basement_size', 'built', 'renovation','living_room_size', 'lot_size','place_name','latitude']]
 
 
-# In[65]:
+# In[109]:
 
 
-# Log transform on X dataset for features with skewness >0.5
-skewness = df.apply(lambda x: skew(x))
-skewness = skewness[abs(skewness) > 0.5]
-skewed_features = skewness.index
-df[skewed_features] = np.log1p(df[skewed_features])
+df_hold = df
 
 
-# In[66]:
+# In[152]:
 
 
 # Separate dataset into X and y
@@ -92,7 +88,18 @@ y_bin = df['price']
 df = df.drop(columns=['price'])
 
 
-# In[67]:
+# In[153]:
+
+
+# Log transform on X dataset for features with skewness >0.5
+skewness = df.apply(lambda x: skew(x))
+skewness = skewness[abs(skewness) > 0.5]
+print(str(skewness) + " skewed numerical features to log transform")
+skewed_features = skewness.index
+df[skewed_features] = np.log1p(df[skewed_features])
+
+
+# In[155]:
 
 
 # create variable bins
@@ -100,14 +107,23 @@ bins = pd.IntervalIndex.from_tuples([(0, 3.230000e+05), (3.230001e+05, 4.520000e
 y_bint = pd.cut(y_bin, bins).cat.codes.to_numpy()
 
 
-# In[68]:
+# In[157]:
 
 
 # Partition the dataset in train + test sets
 X_train, X_test, y_train, y_test = train_test_split(df, y_bint, test_size = 0.5, random_state = 0)
 
 
-# In[70]:
+# In[158]:
+
+
+# Transform features by standardization
+# stdSc = StandardScaler()
+# X_train = np.absolute(stdSc.fit_transform(X_train))
+# X_test = np.absolute(stdSc.transform(X_test))
+
+
+# In[159]:
 
 
 from sklearn.naive_bayes import GaussianNB
@@ -115,7 +131,7 @@ gnb = GaussianNB()
 y_pred = gnb.fit(X_train, y_train).predict(X_test)
 
 
-# In[71]:
+# In[160]:
 
 
 # testing classification model GaussianNB
@@ -125,7 +141,7 @@ c = 1 - b/a
 print("Number of mislabeled points out of a total",a,"points :", b, "accuracy of ", c)
 
 
-# In[72]:
+# In[164]:
 
 
 from sklearn.naive_bayes import MultinomialNB
@@ -133,7 +149,7 @@ mnb = MultinomialNB()
 y_pred = mnb.fit(X_train, y_train).predict(X_test)
 
 
-# In[ ]:
+# In[165]:
 
 
 # testing classification model MultinomialNB
@@ -143,7 +159,7 @@ c = 1 - b/a
 print("Number of mislabeled points out of a total",a,"points :", b, "accuracy of ", c)
 
 
-# In[ ]:
+# In[166]:
 
 
 from sklearn.svm import SVC
@@ -151,7 +167,7 @@ svc = SVC(gamma='auto')
 y_pred = svc.fit(X_train, y_train).predict(X_test)
 
 
-# In[ ]:
+# In[172]:
 
 
 # testing classification model SVC
@@ -161,35 +177,31 @@ c = 1 - b/a
 print("Number of mislabeled points out of a total",a,"points :", b, "accuracy of ", c)
 
 
-# In[ ]:
-
-
-from sklearn.metrics import confusion_matrix
-confusion_matrix(y_test, y_pred)
-
-
-# In[ ]:
+# In[169]:
 
 
 from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
 disp = plot_confusion_matrix(gnb, X_test, y_test,display_labels=[0,1,2,3],cmap=plt.cm.Blues,normalize="true")
 title = "Normalized Confusion Matrix for GaussianNB"
 disp.ax_.set_title(title)
 
 
-# In[ ]:
+# In[170]:
 
 
 from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
 disp = plot_confusion_matrix(mnb, X_test, y_test,display_labels=[0,1,2,3],cmap=plt.cm.Blues,normalize="true")
 title = "Normalized Confusion Matrix for MultinomialNB"
 disp.ax_.set_title(title)
 
 
-# In[ ]:
+# In[171]:
 
 
 from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
 disp = plot_confusion_matrix(svc, X_test, y_test,display_labels=[0,1,2,3],cmap=plt.cm.Blues,normalize="true")
 title = "Normalized Confusion Matrix for SVC"
 disp.ax_.set_title(title)

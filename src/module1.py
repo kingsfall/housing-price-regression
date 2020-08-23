@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import sqlite3
@@ -11,28 +11,28 @@ from scipy.stats import skew
 import pgeocode
 
 
-# In[3]:
+# In[2]:
 
 
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-# In[4]:
+# In[3]:
 
 
 db = sqlite3.connect('home_sales.db')
 df = pd.read_sql_query('SELECT * FROM sales;',db)
 
 
-# In[5]:
+# In[4]:
 
 
 # dropping null values
 df = df.dropna()
 
 
-# In[ ]:
+# In[5]:
 
 
 # feature engineering place_name from zipcode
@@ -44,7 +44,7 @@ df = df.replace({'place_name': {'Auburn':1,'Federal Way':2,'Kent':3,'Enumclaw':4
 })
 
 
-# In[ ]:
+# In[6]:
 
 
 # relabel condition feature
@@ -60,21 +60,21 @@ df.loc[df.condition == 'EXCELLENT'] = df.loc[df.condition == 'EXCELLENT'].replac
 df.loc[df.condition == 'excellent'] = df.loc[df.condition == 'excellent'].replace("excellent","4")
 
 
-# In[ ]:
+# In[7]:
 
 
 # convert object to int
 df['condition'] = df['condition'].astype(str).astype(int)
 
 
-# In[ ]:
+# In[8]:
 
 
 # dropping unnecessary features
 df = df[['price', 'bedrooms', 'bathrooms', 'floors', 'waterfront', 'view', 'condition','review_score', 'basement_size', 'built', 'renovation','living_room_size', 'lot_size','place_name','latitude']]
 
 
-# In[ ]:
+# In[9]:
 
 
 # Log transform housing price
@@ -82,7 +82,7 @@ df['log_price'] = np.log1p(df['price'])
 df = df.drop(columns=['price'])
 
 
-# In[ ]:
+# In[10]:
 
 
 # Separate dataset into X and y
@@ -90,7 +90,7 @@ y = df['log_price']
 df = df.drop(columns=['log_price'])
 
 
-# In[ ]:
+# In[11]:
 
 
 # Log transform on X dataset for features with skewness >0.5
@@ -100,23 +100,24 @@ skewed_features = skewness.index
 df[skewed_features] = np.log1p(df[skewed_features])
 
 
-# In[ ]:
+# In[12]:
 
 
 # Partition the dataset in train + test sets
 X_train, X_test, y_train, y_test = train_test_split(df, y, test_size = 0.5, random_state = 0)
 
 
-# In[ ]:
+# In[13]:
 
 
 # Transform features by standardization
-stdSc = StandardScaler()
-X_train = stdSc.fit_transform(X_train)
-X_test = stdSc.transform(X_test)
+# stdSc = StandardScaler()
+# X_train = stdSc.fit_transform(X_train)
+# X_test = stdSc.transform(X_test)
+# Standardization has no effect on prediction
 
 
-# In[ ]:
+# In[14]:
 
 
 # Function for RMSE evaluation metrics with KFold CV
@@ -132,7 +133,7 @@ def rmse_CV_test(model):
     return rmse
 
 
-# In[ ]:
+# In[15]:
 
 
 from sklearn.linear_model import LinearRegression
@@ -144,7 +145,7 @@ print('rmse on train',rmse_CV_train(lr).mean())
 print('rmse on test',rmse_CV_test(lr).mean())
 
 
-# In[ ]:
+# In[16]:
 
 
 #plot between predicted values and residuals
@@ -159,7 +160,7 @@ print('rmse on test',rmse_CV_test(lr).mean())
 # plt.show()
 
 
-# In[ ]:
+# In[17]:
 
 
 # Plot predictions - Real values
@@ -173,7 +174,7 @@ print('rmse on test',rmse_CV_test(lr).mean())
 # plt.show()
 
 
-# In[ ]:
+# In[18]:
 
 
 # from sklearn.svm import SVR
@@ -185,7 +186,7 @@ print('rmse on test',rmse_CV_test(lr).mean())
 # print('rmse on test',rmse_CV_test(svr_lin).mean())
 
 
-# In[ ]:
+# In[19]:
 
 
 # #plot between predicted values and residuals
@@ -200,7 +201,7 @@ print('rmse on test',rmse_CV_test(lr).mean())
 # plt.show()
 
 
-# In[ ]:
+# In[20]:
 
 
 # # Plot predictions - Real values
